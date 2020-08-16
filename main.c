@@ -36,13 +36,16 @@ char **split(char *line) {
 }
 
 void command(char **arguments){
-  if(! strcmp(arguments[0], "cd")){
-    if(!arguments[1]){
-      chdir("~");
-    }else{
-      if(chdir(arguments[1])){
-        if(errno == 2){
-          printf("directory not found \n");
+  if(arguments[1])
+  {
+    if(! strcmp(arguments[0], "cd")){
+      if(!arguments[1]){
+        chdir("~");
+      }else{
+        if(chdir(arguments[1])){
+          if(errno == 2){
+            printf("directory not found \n");
+          }
         }
       }
     }
