@@ -14,6 +14,8 @@
 
 #define BUFFER 64
 
+
+
 char **split(char *line) {
   line = strtok(line, "\n");
   int buff = BUFFER;
@@ -39,7 +41,9 @@ void command(char **arguments){
   if(arguments[1])
   {
     if(! strcmp(arguments[0], "cd")){
-      if(!arguments[1]){
+      
+      if(arguments[1] == NULL ){
+        printf("general kenobi");
         chdir("~");
       }else{
         if(chdir(arguments[1])){
@@ -55,6 +59,10 @@ void command(char **arguments){
   }
   else if(! strcmp(arguments[0], "clear")){
     printf("\033[2J\033[1;1H");
+  }
+  else if(! strcmp(arguments[0], "help")){
+    printf("Minimalistic shell \n");
+
   }
 }
 void prompt() {
