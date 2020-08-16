@@ -10,10 +10,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #define BUFFER 64
 
 char **split(char *line) {
+  line = strtok(line, "\n");
   int buff = BUFFER;
   char **tokens = malloc(buff * sizeof(char*));
   char *token;
@@ -35,17 +37,13 @@ char **split(char *line) {
 
 void command(char **arguments){
   if(! strcmp(arguments[0], "cd")){
-    printf("%s", arguments[0]);
     if(!arguments[1]){
-
       chdir("~");
     }else{
-          printf("%s", arguments[1]);
-
-      if(!chdir(arguments[1])){
-      }
-      else{
-      	printf("error occured");
+      if(chdir(arguments[1])){
+        if(errno == 2){
+          printf("directory not found \n");
+        }
       }
     }
   }
