@@ -47,6 +47,12 @@ void command(char **arguments){
       }
     }
   }
+  else if(! strcmp(arguments[0], "exit")){
+    exit(0);
+  }
+  else if(! strcmp(arguments[0], "clear")){
+    printf("\033[2J\033[1;1H");
+  }
 }
 void prompt() {
   char input[CHAR_MAX];
