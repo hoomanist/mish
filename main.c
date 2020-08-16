@@ -36,7 +36,7 @@ char **split(char *line) {
 }
 
 void command(char **arguments){
-  if(arguments[1])
+  if(arguments[0])
   {
     if(! strcmp(arguments[0], "cd")){
       if(!arguments[1]){
@@ -49,12 +49,12 @@ void command(char **arguments){
         }
       }
     }
-  }
-  else if(! strcmp(arguments[0], "exit")){
-    exit(0);
-  }
-  else if(! strcmp(arguments[0], "clear")){
-    printf("\033[2J\033[1;1H");
+    else if(! strcmp(arguments[0], "exit")){
+      exit(0);
+    }
+    else if(! strcmp(arguments[0], "clear")){
+      printf("\033[2J\033[1;1H");
+    }
   }
 }
 void prompt() {
