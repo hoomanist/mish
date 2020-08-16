@@ -67,10 +67,11 @@ void prompt() {
   arguments = split(input);
   command(arguments);
   free(arguments);
-  prompt();
 }
 
 int main(int argc, char *argv[]) {
   printf("welcome to minimalistic shell ! \n");
-  prompt();
+  for(;;){
+    prompt();
+  }
 }
