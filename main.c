@@ -83,4 +83,6 @@ int main(int argc, char *argv[]) {
   for(;;){
     prompt();
   }
+
+  return 0;
 }
