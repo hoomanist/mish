@@ -62,8 +62,11 @@ void command(char **arguments){
 
       // if command has got no arguments,
       // working directory should be changed to user home.
-      if(!arguments[1]){
-        chdir("~");
+      if(!arguments[1] || strcmp(arguments[1], "~") == 0){
+
+        // get directory string of user's home
+        // and change working directory there.
+        chdir(getenv("HOME"));
 
       // but if it has an argument,
       }else{
