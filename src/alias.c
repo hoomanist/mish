@@ -26,17 +26,36 @@ void alias_set(char *name, char *command)
 
 }
 
+
 /*
     check if is alias is created
 */
 char *alias_check(char *input){
+    
     FILE *fp;
     char c;
-    char *text;
     char *name;
     char *command;
+
+    // filename for storing aliases
+    char *filename = strcat(getenv("HOME"), "/.mish_alias");
+
+    // open the file storig aliases
+    fp = fopen(filename, "r");
+
+    // get file size
+    fseek(fp, 0, SEEK_END);
+    long int textSize = ftell(fp);
+
+    // close the file and reopen it to start from begining
+    fclose(fp);
+    fp = fopen(filename, "r");
+
+    // file text will be stored in this string.
+    // so allocate enough bytes for it.
+    char* text = malloc(textSize*sizeof(char));
+
     int i=0;
-    fp = fopen("~/.mish_alias", "r");
     if(fp == NULL) {
         perror("Error in opening file");
     } do {
@@ -47,8 +66,9 @@ char *alias_check(char *input){
         text[i] = c;
         i++;
     } while(1);
+
     i = 0;
-    char line = strtok(text, "\n");
+    char* line = strtok(text, "\n");
     while (line != NULL)
     {
         char *token = strtok(line, "\t");
