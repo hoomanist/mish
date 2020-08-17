@@ -10,9 +10,19 @@ void alias_set(char *name, char *command)
 {
     FILE *fp;
     char *inp ;
-    fp = fopen("~/.mish_alias", "a+");
-    sprintf(inp, "%s \t %s ", name, command);
-    fputs(inp, fp);
+
+    // filename for storing aliases
+    char *filename = strcat(getenv("HOME"), "/.mish_alias");
+
+    // open file for storing aliases
+    fp = fopen(filename, "a+");
+
+    // check if file opens with success
+    if(fp != NULL)
+    {
+        sprintf(inp, "%s \t %s ", name, command);
+        fputs(inp, fp);
+    }
 
 }
 
