@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /*
     set alias in file
@@ -9,11 +10,9 @@
 void alias_set(char *name, char *command)
 {
     FILE *fp;
-    char *inp ;
-
+    char inp[CHAR_MAX] ;
     // filename for storing aliases
     char *filename = strcat(getenv("HOME"), "/.mish_alias");
-
     // open file for storing aliases
     fp = fopen(filename, "a+");
 

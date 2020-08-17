@@ -130,9 +130,11 @@ void command(char **arguments){
 
     }
     else if(! strcmp(arguments[0], "alias")){
+      printf("assigning %s to %s \n", arguments[1], arguments[2]);
       alias_set(arguments[1], arguments[2]);
-
     }
+    
+
     else {
       launch(arguments);
     }
