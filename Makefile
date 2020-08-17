@@ -11,7 +11,7 @@ all:
 
 clean:
 	rm mish
-
+	rm *.o
 install:
 	install -D mish /usr/bin
 

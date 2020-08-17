@@ -35,8 +35,10 @@ char *alias_check(char *input){
     char *text;
     char *name;
     char *command;
+    char *filename = strcat(getenv("HOME"), "/.mish_alias");
+
     int i=0;
-    fp = fopen("~/.mish_alias", "r");
+    fp = fopen(filename, "r");
     if(fp == NULL) {
         perror("Error in opening file");
     } do {
