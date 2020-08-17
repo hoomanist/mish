@@ -13,6 +13,8 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include "prototype.h"
+
 
 #define BUFFER 64
 
@@ -125,6 +127,10 @@ void command(char **arguments){
     }
     else if(! strcmp(arguments[0], "help")){
       printf("Minimalistic shell *mish* \n");
+
+    }
+    else if(! strcmp(arguments[0], "alias")){
+      alias_set(arguments[1], arguments[2]);
 
     }
     else {

@@ -1,10 +1,13 @@
 
 #mish is a minimalistic shell under BSD 2 clause
 
-CC=gcc
+CC=clang
 CFLAGS = -g 
 all:
-	$(CC) $(CFLAGS) src/main.c -o mish
+	$(CC) $(CFLAGS) -c src/main.c 
+	$(CC) $(CFLAGS) -c src/alias.c
+	$(CC) $(CFLAGS) main.o alias.o -o mish
+
 
 clean:
 	rm mish
