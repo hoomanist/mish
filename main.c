@@ -11,8 +11,36 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 #define BUFFER 64
+
+
+/* launch a binary (fork & exec) */
+int launch(char **args){
+  pid_t pid;
+  int status;
+
+  pid = fork();
+  if (pid == 0) {
+    // Child process
+    if (execvp(args[0], args) == -1) {
+      perror("mish");
+    }
+    exit(EXIT_FAILURE);
+  } else if (pid < 0) {
+    // Error forking
+    perror("mish");
+  } else {
+    // Parent process
+    do {
+      waitpid(pid, &status, WUNTRACED);
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  }
+  return status;
+
+}
 
 
 /* split a command into tokens
@@ -95,11 +123,16 @@ void command(char **arguments){
       // clear the terminal
       printf("\033[2J\033[1;1H");
     }
-  }
-  else if(! strcmp(arguments[0], "help")){
-    printf("Minimalistic shell \n");
+    else if(! strcmp(arguments[0], "help")){
+      printf("Minimalistic shell *mish* \n");
 
+    }
+    else {
+      launch(arguments);
+    }
   }
+  // if command is 'help' show some help messages
+ 
 }
 
 /* get a command from stdin and parse/execute it
