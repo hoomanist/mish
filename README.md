@@ -1,2 +1,2 @@
 # mish
-a simple training shell
+a minimalistic shell written in c
