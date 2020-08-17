@@ -95,10 +95,10 @@ void command(char **arguments){
       // clear the terminal
       printf("\033[2J\033[1;1H");
     }
-  }
-  else if(! strcmp(arguments[0], "help")){
-    printf("Minimalistic shell \n");
+    else if(! strcmp(arguments[0], "help")){
+      printf("Minimalistic shell \n");
 
+    }
   }
 }
 
