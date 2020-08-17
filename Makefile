@@ -8,3 +8,9 @@ all:
 
 clean:
 	rm mish
+
+install:
+	install -D mish /usr/bin
+
+uninstall:
+	rm /usr/bin/mish
