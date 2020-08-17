@@ -68,14 +68,19 @@ char *alias_check(char *input){
     } while(1);
 
     i = 0;
+    // seprate it by \n
     char* line = strtok(text, "\n");
+    
     while (line != NULL)
     {
+        // seprate by tabs
         char *token = strtok(line, "\t");
         while(token != NULL){
             if(i == 0){
+                // assigning name
                 name = token;
             }else if(i == 1){
+                // command ti run
                 command = token;
             }
             else{
@@ -83,12 +88,14 @@ char *alias_check(char *input){
             }
             token = strtok(NULL, "\t");
         }
+        // check if it is alias
         if(! strcmp(input, name))
             return command;
         else {
             continue;
         } 
     }
+    // if it is not alias
     return input;
 
 }
