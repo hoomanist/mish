@@ -4,7 +4,7 @@
 CC=gcc
 CFLAGS = -g 
 all:
-	$(CC) $(CFLAGS) main.c -o mish
+	$(CC) $(CFLAGS) src/main.c -o mish
 
 clean:
 	rm mish
