@@ -4,14 +4,15 @@
 CC=clang
 CFLAGS = -g 
 all:
-	$(CC) $(CFLAGS) -c src/main.c 
-	$(CC) $(CFLAGS) -c src/alias.c
-	$(CC) $(CFLAGS) main.o alias.o -o mish
+	$(ls -l | grep built) &> /dev/null || mkdir built
+	$(CC) $(CFLAGS) -c src/main.c -o built/main.o
+	$(CC) $(CFLAGS) -c src/alias.c -o built/alias.o
+	$(CC) $(CFLAGS) built/main.o built/alias.o -o mish
 
 
 clean:
 	rm mish
-	rm *.o
+	rm -rf built 
 install:
 	install -D mish /usr/bin
 
