@@ -42,6 +42,12 @@ char *alias_check(char *input){
 
     // open the file storig aliases
     fp = fopen(filename, "r");
+    
+    if(fp == NULL) {
+        perror("Error in opening file");
+        return input;
+    }
+
 
     // get file size
     fseek(fp, 0, SEEK_END);
@@ -56,9 +62,7 @@ char *alias_check(char *input){
     char* text = malloc(textSize*sizeof(char));
 
     int i=0;
-    if(fp == NULL) {
-        perror("Error in opening file");
-    } do {
+    do {
         c = fgetc(fp);
         if( feof(fp) ) {
             break ;
@@ -67,7 +71,11 @@ char *alias_check(char *input){
         i++;
     } while(1);
 
+    fclose(fp);
+
+
     i = 0;
+
     // seprate it by \n
     char* line = strtok(text, "\n");
     
