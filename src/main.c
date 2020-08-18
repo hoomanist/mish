@@ -16,10 +16,11 @@
 #include <signal.h>
 #include "prototype.h"
 
-
+// macros
 #define BUFFER 64
 
 
+/*do at startup*/
 void init(){
       putenv("PATH=/bin:/usr/bin:/usr/local/bin");
 }
@@ -200,10 +201,12 @@ void prompt() {
 int main(int argc, char *argv[]) {
 
   // signal handels
+  //SIGINT(ctrl-c) handler -> src/signal_handel.c -> void sigint_handel();
   if (signal(SIGINT, sigint_handel) == SIG_ERR) {
     fputs("An error occurred while setting a signal handler.\n", stderr);
     return EXIT_FAILURE;
   }
+  // SIGQUIT(ctrl-d) handler -> src/signal_handler.c -> void sigquit_handel();
   if (signal(SIGQUIT, sigquit_handel) == SIG_ERR) {
     fputs("An error occurred while setting a signal handler.\n", stderr);
     return EXIT_FAILURE;
