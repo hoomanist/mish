@@ -11,3 +11,32 @@ a minimalistic shell written in c
 - [ ] better aliasing logic
 - [ ] if-else statements  
 - [ ] PS1 
+
+## compile and install
+
+note: you mustn't use this in production yet
+
+for just running:
+
+```
+$ make clean all
+$ ./mish
+```
+
+for installation(not recommanded):
+
+```
+$ make clean all
+# make install
+$ mish
+```
+
+for uninstallation:
+
+```
+# make uninstall 
+```
+or
+```
+# rm /usr/bin/mish
+```
