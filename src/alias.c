@@ -78,9 +78,14 @@ char *alias_check(char *input){
 
     // seprate it by \n
     char* line = strtok(text, "\n");
-    
+
+    char* rest = text;
+
     while (line != NULL)
     {
+
+    line = strtok_r(rest, "\n", &rest);
+
         // seprate by tabs
         char *token = strtok(line, "\t");
         while(token != NULL){
