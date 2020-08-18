@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <signal.h>
 #include "prototype.h"
 
 
@@ -189,12 +190,24 @@ void prompt() {
   command(arguments);
 
   free(arguments);
+
+
 }
 
 /*
   start of program.
 */
 int main(int argc, char *argv[]) {
+
+  // signal handels
+  if (signal(SIGINT, sigint_handel) == SIG_ERR) {
+    fputs("An error occurred while setting a signal handler.\n", stderr);
+    return EXIT_FAILURE;
+  }
+  if (signal(SIGQUIT, sigquit_handel) == SIG_ERR) {
+    fputs("An error occurred while setting a signal handler.\n", stderr);
+    return EXIT_FAILURE;
+  }
 
   // hello message of the shell goes here
   printf("welcome to minimalistic shell ! \n");
