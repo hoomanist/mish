@@ -19,14 +19,20 @@
 #define BUFFER 64
 
 
+void init(){
+      putenv("PATH=/bin:/usr/bin:/usr/local/bin");
+}
+
+
 /* launch a binary (fork & exec) */
 int launch(char **args){
   pid_t pid;
   int status;
-
+  char *executable = alias_check(args[0]);
   pid = fork();
   if (pid == 0) {
     // Child process
+    printf("%s", executable);
     if (execvp(args[0], args) == -1) {
       perror("mish");
     }
@@ -192,7 +198,8 @@ int main(int argc, char *argv[]) {
 
   // hello message of the shell goes here
   printf("welcome to minimalistic shell ! \n");
-
+  // initial works
+  init();
   // start getting commands
   for(;;){
     prompt();

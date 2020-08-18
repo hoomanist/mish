@@ -4,11 +4,12 @@
 CC=clang
 CFLAGS = -g 
 all:
-	$(ls -l | grep built) &> /dev/null || mkdir built
+	mkdir built
 	$(CC) $(CFLAGS) -c src/main.c -o built/main.o
 	$(CC) $(CFLAGS) -c src/alias.c -o built/alias.o
-	$(CC) $(CFLAGS) built/main.o built/alias.o -o mish
-
+	$(CC) $(CFLAGS) -c src/path.c -o built/path.o
+	$(CC) $(CFLAGS) built/main.o built/alias.o built/path.o -o mish
+	rm -rf built
 
 clean:
 	rm mish

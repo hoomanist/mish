@@ -19,7 +19,7 @@ void alias_set(char *name, char *command)
     // check if file opens with success
     if(fp != NULL)
     {
-        sprintf(inp, "%s \t %s ", name, command);
+        sprintf(inp, "%s=%s\n ", name, command);
         fputs(inp, fp);
         fclose(fp);
     }
@@ -87,7 +87,7 @@ char *alias_check(char *input){
     line = strtok_r(rest, "\n", &rest);
 
         // seprate by tabs
-        char *token = strtok(line, "\t");
+        char *token = strtok(line, "=");
         while(token != NULL){
             if(i == 0){
                 // assigning name
@@ -99,7 +99,7 @@ char *alias_check(char *input){
             else{
                 break;
             }
-            token = strtok(NULL, "\t");
+            token = strtok(NULL, "=");
         }
         // check if it is alias
         if(! strcmp(input, name))
