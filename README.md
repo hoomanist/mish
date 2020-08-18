@@ -11,6 +11,9 @@ a minimalistic shell written in c
 - [ ] better aliasing logic
 - [ ] if-else statements  
 - [ ] PS1 
+- [ ] pipelines and redirection
+- [ ] env variables 
+- [ ] commands file despatcher  
 
 ## compile and install
 
