@@ -52,7 +52,7 @@ char **split(char *line, int *counter) {
   char **tokens; 
   char *token;
   
-  if(line == 0x0) { /* ctrl-d,*/
+  if(line == 0x0) { /* ctrl-d, when ctrl-d is pressed, EOF(0x0) is returned, so we shouldn't let it go further than here.*/
     printf("\nGoodBye :D\n");
     mish_exit(NULL);
   }
@@ -94,7 +94,7 @@ int spawn(char **argv) {
         perror("execvp");
         _exit(EXIT_FAILURE);
     default:
-      wait(&status);
+      wait(&status); /*TODO: set $? to the status*/
   }
   return status;
 }
@@ -106,9 +106,7 @@ void prompt() {
   char **arguments;
   char cwd[PATH_MAX];
   int counter;
-  char prompt[PATH_MAX + 1];
-  // get working directory
-  // also check for errors
+  char prompt[PATH_MAX + 5];
   
   identify = (getuid() == 0)?'#':'$';
   
