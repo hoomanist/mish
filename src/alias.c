@@ -21,6 +21,7 @@ void alias_set(char *name, char *command)
     {
         sprintf(inp, "%s \t %s ", name, command);
         fputs(inp, fp);
+        fclose(fp);
     }
 
 }
