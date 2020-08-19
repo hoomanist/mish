@@ -10,213 +10,137 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <setjmp.h>
 #include <errno.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <signal.h>
-#include "prototype.h"
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "built_in.h"
 
-// macros
-#define BUFFER 64
+#define BUILTINS_SIZE 4
+#define DELIM " \t\n\r"
+long ARG_MAX;
+static jmp_buf jmpbf;
 
+
+struct bi {
+  char *name;
+  int (*func_ptr)(void *arg);
+};
+
+struct bi builtins [BUILTINS_SIZE]={
+  {"cd", mish_cd},
+  {"pwd", mish_pwd},
+  {"exit", mish_exit},
+  {"echo", mish_echo}
+};
 
 /*do at startup*/
 void init(){
       putenv("PATH=/bin:/usr/bin:/usr/local/bin");
 }
 
-
-/* launch a binary (fork & exec) */
-int launch(char **args){
-  pid_t pid;
-  int status;
-  char *executable = alias_check(args[0]);
-  pid = fork();
-  if (pid == 0) {
-    // Child process
-    printf("%s", executable);
-    if (execvp(args[0], args) == -1) {
-      perror("mish");
-    }
-    exit(EXIT_FAILURE);
-  } else if (pid < 0) {
-    // Error forking
-    perror("mish");
-  } else {
-    // Parent process
-    do {
-      waitpid(pid, &status, WUNTRACED);
-    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-  }
-  return status;
-
+void sigint_handler(int signum) {
+  printf("\n");
+  siglongjmp(jmpbf, 1); 
 }
 
-
-/* split a command into tokens
-*/
-char **split(char *line) {
-
-  // split input by newline
-  line = strtok(line, "\n");
-  int buff = BUFFER;
-
-  // tokens will be stored here
-  char **tokens = malloc(buff * sizeof(char*));
+char **split(char *line, int *counter) {
+  int j;
+  char **tokens; 
   char *token;
-
-  if (tokens == NULL) {
-    printf("mish: allocation error\n");
-    exit(1);
+  
+  tokens = malloc(ARG_MAX * sizeof(char *));
+  if(tokens == NULL) {
+    perror("malloc");
+    exit(EXIT_FAILURE);
   }
-
-  // token index counter
-  int i = 0;
-
-  // split line by whitespace
-  token = strtok(line, " "); 
-  while (token != NULL) { 
-      tokens[i] = token;
-      i++;
-      token = strtok(NULL, " ");
-
-  } 
-  tokens[i] = NULL;
-
+  
+  j = 0;
+  token = strtok(line, DELIM);
+  while(token != NULL) {
+    token[strlen(token)] = '\0'; /*not sure about this*/
+    tokens[j] = strdup(token); /*these should be freed*/
+    token = strtok(NULL, DELIM);
+    j++;
+  }
+  tokens[j] = NULL;
+  *counter = j; /*so we know how many buffers to free*/
   return tokens;
 }
 
-/* execute a command.
-command is a string array with each argument in a seperate element.
-*/
-void command(char **arguments){
-
-  // check if command is not empty
-  if(arguments[0])
-  {
-
-    // if command was 'cd', working directory should be changed.
-    if(! strcmp(arguments[0], "cd")){
-
-      // if command has got no arguments,
-      // working directory should be changed to user home.
-      if(!arguments[1] || strcmp(arguments[1], "~") == 0){
-
-        // get directory string of user's home
-        // and change working directory there.
-        chdir(getenv("HOME"));
-
-      // but if it has an argument,
-      }else{
-
-        // change working directory.
-        if(chdir(arguments[1])){
-
-          // if address were given wrong
-          if(errno == 2){
-            printf("directory not found \n");
-          }
-        }
-      }
-    }
-
-    // if command is 'exit' shell should be terminated.
-    else if(! strcmp(arguments[0], "exit")){
-
-      // terminate the shell
-      exit(0);
-    }
-
-    // if command is 'clear', screen should be cleared.
-    else if(! strcmp(arguments[0], "clear")){
-
-      // clear the terminal
-      printf("\033[2J\033[1;1H");
-    }
-    else if(! strcmp(arguments[0], "help")){
-      printf("Minimalistic shell *mish* \n");
-
-    }
-    else if(! strcmp(arguments[0], "alias")){
-      printf("assigning %s to %s \n", arguments[1], arguments[2]);
-      alias_set(arguments[1], arguments[2]);
-    }
-    
-
-    else {
-      launch(arguments);
+int spawn(char **argv) {
+  int status;
+  /*check if the command is built_in*/
+  
+  for(int i = 0; i < BUILTINS_SIZE; i++) {
+    if(strcmp(argv[0], builtins[i].name) == 0) {
+      builtins[i].func_ptr(argv[1]);
+      return 0; 
     }
   }
-  // if command is 'help' show some help messages
- 
+  /*not reachable if the command was builtin*/
+  switch(fork()) {
+    case -1: perror("fork"); return -1;
+    case 0:
+        execvp(argv[0], argv);
+        perror("execvp");
+        _exit(EXIT_FAILURE);
+    default:
+      wait(&status); /*TODO: set $? to the status*/
+  }
+  return status;
 }
 
-/* get a command from stdin and parse/execute it
-*/
 void prompt() {
 
-  char input[CHAR_MAX];
-  char identify[4];
+  char *input;
+  char identify;
   char **arguments;
-  char cwd[CHAR_MAX];
-
-  // get working directory
-  // also check for errors
+  char cwd[PATH_MAX];
+  int counter;
+  char prompt[PATH_MAX + 5];
+  
+  identify = (getuid() == 0)?'#':'$';
+  
   if (!(getcwd(cwd, sizeof(cwd)) != NULL)) {
     perror("getcwd() error");
   }
 
-  // get user ID
-  uid_t user = getuid();
-
-  // if user was logged in as root, show a '#' sign.
-  if (user == 0) {
-    strcpy(identify, "#");
-
-  // if user was logged in as normal user, show a '$' sign.
-  } else {
-    strcpy(identify, "$");
+  snprintf(prompt, sizeof(cwd) + sizeof(identify) + 4, "[%s]%c ", cwd, identify);
+  input = readline(prompt);
+  if(input == 0x0) { /* ctrl-d, when ctrl-d is pressed, EOF(0x0) is returned, so we shouldn't let it go further than here.*/
+    printf("\nGoodBye :D\n");
+    mish_exit(NULL);
+  }
+  if(strcmp(input, "") == 0) {
+    free(input);
+    longjmp(jmpbf, 1);
   }
 
-  // print out begining of command line
-  printf("[%s]%s ", cwd, identify);
-
-  // get user command from stdin
-  fgets(input, sizeof(input), stdin);
-
-  // split command arguments
-  arguments = split(input);
-
-  // execute the command
-  command(arguments);
-
+  add_history(input);
+  arguments = split(input, &counter);
+  spawn(arguments);
+  
+  for(int i = 0; i < counter; i++) {
+    free(arguments[i]);
+  }
   free(arguments);
-
-
+  free(input);
 }
-
 /*
   start of program.
 */
 int main(int argc, char *argv[]) {
-
-  // signal handels
-  //SIGINT(ctrl-c) handler -> src/signal_handel.c -> void sigint_handel();
-  if (signal(SIGINT, sigint_handel) == SIG_ERR) {
-    fputs("An error occurred while setting a signal handler.\n", stderr);
-    return EXIT_FAILURE;
-  }
-  // SIGQUIT(ctrl-d) handler -> src/signal_handler.c -> void sigquit_handel();
-  if (signal(SIGQUIT, sigquit_handel) == SIG_ERR) {
-    fputs("An error occurred while setting a signal handler.\n", stderr);
-    return EXIT_FAILURE;
-  }
-
-  // hello message of the shell goes here
-  printf("welcome to minimalistic shell ! \n");
-  // initial works
-  init();
-  // start getting commands
+  ARG_MAX = sysconf(ARG_MAX);
+  
+  signal(SIGINT, sigint_handler);
+  signal(SIGQUIT, SIG_IGN);
+  signal(SIGSTOP, SIG_IGN);
+  
+  sigsetjmp(jmpbf, 1);
   for(;;){
     prompt();
   }
