@@ -4,8 +4,7 @@
 CC=cc
 CFLAGS = -g -lreadline -Wall  
 all:
-	mkdir built
-	$(CC) $(CFLAGS) -c src/main.c -o built/main.o
-	${CC} $(CFLAGS) -c src/built_in.c -o built/built_in.o
-	$(CC) $(CFLAGS) built/main.o  built/built_in.o -o mish
-	rm -rf built
+	$(CC) $(CFLAGS) -c src/main.c -o main.o
+	${CC} $(CFLAGS) -c src/built_in.c -o built_in.o
+	$(CC) $(CFLAGS) main.o  built_in.o -o mish
+	rm -rf *.o
