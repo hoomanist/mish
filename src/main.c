@@ -116,8 +116,8 @@ void prompt() {
     mish_exit(NULL);
   }
   if(strcmp(input, "") == 0) {
-  	free(input);
-  	longjmp(jmpbf, 1);
+    free(input);
+    longjmp(jmpbf, 1);
   }
 
   add_history(input);
