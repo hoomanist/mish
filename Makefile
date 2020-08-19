@@ -8,7 +8,6 @@ all:
 	$(CC) $(CFLAGS) -c src/main.c -o build/main.o
 	${CC} $(CFLAGS) -c src/built_in.c -o build/built_in.o
 	$(CC) $(CFLAGS) build/main.o  build/built_in.o -o mish
-	rm -rf *.o
 
 clean:
 	rm build/built_in.o build/main.o
