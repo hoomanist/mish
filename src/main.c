@@ -52,11 +52,6 @@ char **split(char *line, int *counter) {
   char **tokens; 
   char *token;
   
-  if(line == 0x0) { /* ctrl-d, when ctrl-d is pressed, EOF(0x0) is returned, so we shouldn't let it go further than here.*/
-    printf("\nGoodBye :D\n");
-    mish_exit(NULL);
-  }
-  
   tokens = malloc(ARG_MAX * sizeof(char *));
   if(tokens == NULL) {
     perror("malloc");
@@ -116,6 +111,15 @@ void prompt() {
 
   snprintf(prompt, sizeof(cwd) + sizeof(identify) + 4, "[%s]%c ", cwd, identify);
   input = readline(prompt);
+  if(input == 0x0) { /* ctrl-d, when ctrl-d is pressed, EOF(0x0) is returned, so we shouldn't let it go further than here.*/
+    printf("\nGoodBye :D\n");
+    mish_exit(NULL);
+  }
+  if(strcmp(input, "") == 0) {
+  	free(input);
+  	longjmp(jmpbf, 1);
+  }
+
   add_history(input);
   arguments = split(input, &counter);
   spawn(arguments);
